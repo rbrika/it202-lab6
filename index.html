@@ -15,9 +15,12 @@
 			display: none;
 			margin: 1em;
 		}
-        .listTemplate .detailedTemplate{
+        .listTemplate {
 			display: none;
 		}
+        .detailedTemplate{
+            display: none;
+        }
 	</style>
      <!-- Include Dexie -->
       <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
@@ -54,7 +57,7 @@
   </div>
   <div class="content" id="list">
     <div id ="cardsList">  </div>
-	<div class="card listTemplate" style="width: 72rem;">
+	<div class="card listTemplate" style="width: auto;">
 		<div class="card-body">
 			<h5 class="card-title">Card title</h5>
 			<h6 class="card-date mb-2 text-muted">Card date</h6>
@@ -63,7 +66,7 @@
   </div>
   <div class="content" id="detailed">
      <div id ="cardsDetailed">  </div>
-	<div class="card detailedTemplate" style="width: 72rem;">
+	<div class="card detailedTemplate" style="width: auto;">
 		<div class="card-body">
 			<h5 class="card-title">Card title</h5>
 			<h6 class="card-date mb-2 text-muted">Card subtitle</h6>
@@ -96,10 +99,9 @@
              $(target).show();
              console.log(target);
              if(target=="#list"){
-                 var clone;
                  $("#cardsList").empty();
                  db.notes.each(function(note){
-                     clone = $(".listTemplate").clone();
+                     var clone = $(".listTemplate").clone();
                      clone.find(".card-title").text(note.title);
                      clone.find(".card-date").text(note.date); 
                      clone.removeClass("listTemplate");
@@ -107,10 +109,10 @@
                 });
              }
              else if(target=="#detailed"){
-                 var clone;
+                 
                  $("#cardsDetailed").empty();
                  db.notes.each(function(note){
-                     clone = $(".detailedTemplate").clone();
+                     var clone = $(".detailedTemplate").clone();
                      clone.find(".card-title").text(note.title);
                      clone.find(".card-date").text(note.date); 
                      clone.find(".card-note").text(note.note); 
