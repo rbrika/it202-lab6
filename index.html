@@ -21,6 +21,17 @@
         .detailedTemplate{
             display: none;
         }
+        #note{
+            height:200px;
+            font-size:14pt;
+        }
+        #MyForm{
+	display: none;
+    width: 300px;
+    border: 1px solid #ccc;
+    padding: 14px;
+    background: #ececec;
+}	
 	</style>
      <!-- Include Dexie -->
       <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
@@ -49,16 +60,19 @@
   <div class="content" id="home">
     Create Note
       <form id="myForm">
+          Subject:<br>
       <input type="text" id="title" placeholder="Enter title">
+          <br> Date:<br>
       <input type="text" id="date" placeholder="Enter date"> 
+          <br> Message:<br>
       <input type="text" id="note" placeholder="Enter note">
       </form>
-      <button id="createButton">Create Note</button>
+      <button id="createButton">Submit</button>
   </div>
   <div class="content" id="list">
     <div id ="cardsList">  </div>
 	<div class="card listTemplate" style="width: auto;">
-		<div class="card-body">
+		<div class="card-bodyList">
 			<h5 class="card-title">Card title</h5>
 			<h6 class="card-date mb-2 text-muted">Card date</h6>
 		</div>
@@ -72,9 +86,13 @@
 			<h6 class="card-date mb-2 text-muted">Card subtitle</h6>
 			<p class="card-note">Some quick example text to build on
                 the card title and make up the bulk of the card's content.</p>
+            <button id="replyButton">Reply</button>
+            
 		</div>
 	</div> 
+      
   </div>
+    
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -83,35 +101,30 @@
 
     <script>
       $(document).ready(function() {
+          $("#home").show();
          var db = new Dexie("friend_database");
          db.version(1).stores({
-              notes: 'title,date,note'
+              notes: '++id,title,date,note'
          });
           
          function hideScreens() {
              $(".content").hide();
          }
-          
-         $(".nav-link").on("click", function(){
-             hideScreens();
-             console.log("clicked on nav content");
-             var target = $(this).attr("href");
-             $(target).show();
-             console.log(target);
-             if(target=="#list"){
-                 $("#cardsList").empty();
+         function loadNotesList(){
+             $("#cardsList").empty();
                  db.notes.each(function(note){
                      var clone = $(".listTemplate").clone();
                      clone.find(".card-title").text(note.title);
                      clone.find(".card-date").text(note.date); 
+                     clone.attr("data-id",note.id);
+                     console.log(note.id);
                      clone.removeClass("listTemplate");
                      $("#cardsList").append(clone);
                 });
-             }
-             else if(target=="#detailed"){
-                 
-                 $("#cardsDetailed").empty();
-                 db.notes.each(function(note){
+         } 
+          function loadNotesDetailed(id){
+             $("#cardsDetailed").empty();
+                 db.notes.where(id).then(function(note){
                      var clone = $(".detailedTemplate").clone();
                      clone.find(".card-title").text(note.title);
                      clone.find(".card-date").text(note.date); 
@@ -119,6 +132,18 @@
                      clone.removeClass("detailedTemplate");
                      $("#cardsDetailed").append(clone);
                  });
+         } 
+         $(".nav-link").on("click", function(){
+             hideScreens();
+             console.log("clicked on nav content");
+             var target = $(this).attr("href");
+             $(target).show();
+             console.log(target);
+             if(target=="#list"){
+                 loadNotesList();
+             }
+             else if(target=="#detailed"){
+                 
              }
          });
           
@@ -127,6 +152,14 @@
                            date: $("#date").val(),
                            note: $("#note").val()}) ;   
          });
+         $("#replyButton").on("click",function(){
+             console.log("clicked reply");
+         }); 
+           $("body").on("click",".card-bodyList",function(){
+              console.log("on click" );
+              loadNotesDetailed($(this).attr("data-id"));
+           });
+
       });
     </script>
 
