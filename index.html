@@ -15,6 +15,9 @@
 			display: none;
 			margin: 1em;
 		}
+        .listTemplate .detailedTemplate{
+			display: none;
+		}
 	</style>
      <!-- Include Dexie -->
       <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
@@ -50,8 +53,8 @@
       <button id="createButton">Create Note</button>
   </div>
   <div class="content" id="list">
-    <div id ="cards">  </div>
-	<div class="card template" style="width: 18rem;">
+    <div id ="cardsList">  </div>
+	<div class="card listTemplate" style="width: 72rem;">
 		<div class="card-body">
 			<h5 class="card-title">Card title</h5>
 			<h6 class="card-date mb-2 text-muted">Card date</h6>
@@ -59,15 +62,15 @@
 	</div>
   </div>
   <div class="content" id="detailed">
-<!--     <div id ="cards">  </div>
-	<div class="card template" style="width: 18rem;">
+     <div id ="cardsDetailed">  </div>
+	<div class="card detailedTemplate" style="width: 72rem;">
 		<div class="card-body">
 			<h5 class="card-title">Card title</h5>
 			<h6 class="card-date mb-2 text-muted">Card subtitle</h6>
 			<p class="card-note">Some quick example text to build on
                 the card title and make up the bulk of the card's content.</p>
 		</div>
-	</div> -->
+	</div> 
   </div>
 
 
@@ -77,45 +80,51 @@
 
     <script>
       $(document).ready(function() {
-          var db = new Dexie("friend_database");
-          db.version(1).stores({
+         var db = new Dexie("friend_database");
+         db.version(1).stores({
               notes: 'title,date,note'
-          });
-
-        function hideScreens() {
-          $(".content").hide();
-        }
-
-        $(".nav-link").on("click", function(){
-          hideScreens();
-          var target = $(this).attr("href");
-           
-                $(target).show();
-            
+         });
           
-        });
+         function hideScreens() {
+             $(".content").hide();
+         }
           
+         $(".nav-link").on("click", function(){
+             hideScreens();
+             console.log("clicked on nav content");
+             var target = $(this).attr("href");
+             $(target).show();
+             console.log(target);
+             if(target=="#list"){
+                 var clone;
+                 $("#cardsList").empty();
+                 db.notes.each(function(note){
+                     clone = $(".listTemplate").clone();
+                     clone.find(".card-title").text(note.title);
+                     clone.find(".card-date").text(note.date); 
+                     clone.removeClass("listTemplate");
+                     $("#cardsList").append(clone);
+                });
+             }
+             else if(target=="#detailed"){
+                 var clone;
+                 $("#cardsDetailed").empty();
+                 db.notes.each(function(note){
+                     clone = $(".detailedTemplate").clone();
+                     clone.find(".card-title").text(note.title);
+                     clone.find(".card-date").text(note.date); 
+                     clone.find(".card-note").text(note.note); 
+                     clone.removeClass("detailedTemplate");
+                     $("#cardsDetailed").append(clone);
+                 });
+             }
+         });
           
          $("#createButton").on("click", function(){
              db.notes.put({title: $("#title").val(), 
                            date: $("#date").val(),
                            note: $("#note").val()}) ;   
-          });
-          
-         $("#link").on("show",function(){
-             console.log("in link show");
-             var clone;
-          db.notes.each(function(note){
-              clone = $(".template").clone();
-            clone.find(".card-title").text(note.title);
-            clone.find(".card-date").text(note.date); 
-             clone.removeClass("template")
-            $("#cards").append(clone);
-          }
-             
-                        );
-      });
-
+         });
       });
     </script>
 
