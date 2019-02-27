@@ -3,14 +3,20 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
-	<title>3 screen app</title>
+    <meta charset="utf-8">
+    <link rel='manifest' href='./manifest.json'>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+	<title>Notes App</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
 	 crossorigin="anonymous">
 
      <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
 	<style>
+        .navbar{
+            background-color:blue;
+        }
 		.content {
 			display: none;
 			margin: 1em;
@@ -71,7 +77,7 @@
   </div>
   <div class="content" id="list">
     <div id ="cardsList">  </div>
-	<div class="card listTemplate" style="width: auto;">
+	<div id="cardList"class="card listTemplate" style="width: auto;">
 		<div class="card-bodyList">
 			<h5 class="card-title">Card title</h5>
 			<h6 class="card-date mb-2 text-muted">Card date</h6>
@@ -80,7 +86,7 @@
   </div>
   <div class="content" id="detailed">
      <div id ="cardsDetailed">  </div>
-	<div class="card detailedTemplate" style="width: auto;">
+	<div id="cardDets" class="card detailedTemplate" style="width: auto;">
 		<div class="card-body">
 			<h5 class="card-title">Card title</h5>
 			<h6 class="card-date mb-2 text-muted">Card subtitle</h6>
@@ -104,7 +110,7 @@
           $("#home").show();
          var db = new Dexie("friend_database");
          db.version(1).stores({
-              notes: '++id,title,date,note'
+              notes: "++id,title,date,note"
          });
           
          function hideScreens() {
@@ -116,7 +122,7 @@
                      var clone = $(".listTemplate").clone();
                      clone.find(".card-title").text(note.title);
                      clone.find(".card-date").text(note.date); 
-                     clone.attr("data-id",note.id);
+                     $("#cardList").attr("data-id",note.id);
                      console.log(note.id);
                      clone.removeClass("listTemplate");
                      $("#cardsList").append(clone);
@@ -124,13 +130,18 @@
          } 
           function loadNotesDetailed(id){
              $("#cardsDetailed").empty();
-                 db.notes.where(id).then(function(note){
+              console.log(typeof parseInt(id));
+              console.log(parseInt(id));
+                 db.notes.get(parseInt(id)).then(function(note){
+                     console.log(note);
                      var clone = $(".detailedTemplate").clone();
                      clone.find(".card-title").text(note.title);
                      clone.find(".card-date").text(note.date); 
                      clone.find(".card-note").text(note.note); 
                      clone.removeClass("detailedTemplate");
                      $("#cardsDetailed").append(clone);
+                     hideScreens();
+                     $("#detailed").show();
                  });
          } 
          $(".nav-link").on("click", function(){
@@ -155,12 +166,18 @@
          $("#replyButton").on("click",function(){
              console.log("clicked reply");
          }); 
-           $("body").on("click",".card-bodyList",function(){
-              console.log("on click" );
-              loadNotesDetailed($(this).attr("data-id"));
-           });
+         $("body").on("click","#cardList",function(){
+             console.log("on click" );
+             loadNotesDetailed($(this).attr("data-id"));
+         });
 
       });
+        // register the service worker for offline use
+        if('serviceWorker' in navigator) {
+          navigator.serviceWorker
+                   .register('./sw.js')
+                   .then(function() { console.log("Service Worker Registered"); });
+        }
     </script>
 
 
