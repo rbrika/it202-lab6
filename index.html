@@ -17,6 +17,18 @@
         .navbar{
             background-color:blue;
         }
+        .navbar-brand{
+            color:black;
+        }
+        .navbar-toggler-icon{
+            color:black;
+        }
+        .navbar-toggler{
+            color:black;
+        }
+        .nav-link{
+            color:black;
+        }
 		.content {
 			display: none;
 			margin: 1em;
@@ -31,20 +43,26 @@
             height:200px;
             font-size:14pt;
         }
-        #MyForm{
-	display: none;
-    width: 300px;
-    border: 1px solid #ccc;
-    padding: 14px;
-    background: #ececec;
-}	
+        #responseForm{
+	        width: auto;
+            display: none;
+        }	
+        #submitButton{
+            display: none;
+        }
+        #cardDets #resp {
+              border-bottom: solid gray 2px;
+        }
+        #responseHeader{
+           display: none; 
+        }
 	</style>
      <!-- Include Dexie -->
       <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
 </head>
 
 <body>
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	<nav class="navbar navbar-light">
 		<a class="navbar-brand" href="#">Navbar</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -92,11 +110,15 @@
 			<h6 class="card-date mb-2 text-muted">Card subtitle</h6>
 			<p class="card-note">Some quick example text to build on
                 the card title and make up the bulk of the card's content.</p>
-            <button id="replyButton">Reply</button>
-            
+            <button id="replyButton" onclick="reply()">Reply</button>
+            <form id="responseForm" >
+                Subject:<br>
+                  <input type="text" id="response" placeholder="Response">
+            </form>
+            <button id="submitButton" onclick="submit()">Submit</button>
+            <br><h5 id="responseHeader">Responses</h5>
 		</div>
 	</div> 
-      
   </div>
     
 
@@ -106,6 +128,22 @@
       
 
     <script>
+        function reply(){
+              console.log("clicked reply");
+             $("#responseForm").show();
+            $("#submitButton").show();
+          }
+        function submit(){
+              console.log("clicked submit");
+            $("#responseHeader").show();
+             $("#responseForm").hide();
+            $("#submitButton").hide();
+            var p = $("<p>");
+            p.attr('id','resp');
+            p.addClass("list-note");
+            p.text($("#response").val()); 
+            $("#cardDets").append(p);
+          }
       $(document).ready(function() {
           $("#home").show();
          var db = new Dexie("friend_database");
@@ -124,21 +162,13 @@
                      clone.find(".card-date").text(note.date); 
                      clone.find(".card-date").text(note.date); 
                      clone.attr("data-id",note.id);
-                     console.log(note);
-                     //$("#cardList").attr("data-id",note.id);
-                     console.log(note.title);
-                     console.log(note.id);
-                     console.log(parseInt($("cardsList").attr("data-id")));
                      clone.removeClass("listTemplate");
                      $("#cardsList").append(clone);
                 });
          } 
           function loadNotesDetailed(id){
              $("#cardsDetailed").empty();
-              console.log(typeof parseInt(id));
-              console.log(parseInt(id));
                  db.notes.get(parseInt(id)).then(function(note){
-                     console.log(note.id);
                      var clone = $(".detailedTemplate").clone();
                      clone.find(".card-title").text(note.title);
                      clone.find(".card-date").text(note.date); 
@@ -154,7 +184,6 @@
              console.log("clicked on nav content");
              var target = $(this).attr("href");
              $(target).show();
-             console.log(target);
              if(target=="#list"){
                  loadNotesList();
              }
@@ -168,12 +197,9 @@
                            date: $("#date").val(),
                            note: $("#note").val()}) ;   
          });
-         $("#replyButton").on("click",function(){
-             console.log("clicked reply");
-         }); 
+      
+          
          $("body").on("click","#cardList",function(){
-             console.log("on click" );
-              console.log($(this).find(".card-title").text());
              loadNotesDetailed($(this).attr("data-id"));
          });
 
