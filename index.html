@@ -77,7 +77,7 @@
   </div>
   <div class="content" id="list">
     <div id ="cardsList">  </div>
-	<div id="cardList"class="card listTemplate" style="width: auto;">
+	<div id="cardList"class="card listTemplate" style="width: auto;" data-id="">
 		<div class="card-bodyList">
 			<h5 class="card-title">Card title</h5>
 			<h6 class="card-date mb-2 text-muted">Card date</h6>
@@ -122,8 +122,13 @@
                      var clone = $(".listTemplate").clone();
                      clone.find(".card-title").text(note.title);
                      clone.find(".card-date").text(note.date); 
-                     $("#cardList").attr("data-id",note.id);
+                     clone.find(".card-date").text(note.date); 
+                     clone.attr("data-id",note.id);
+                     console.log(note);
+                     //$("#cardList").attr("data-id",note.id);
+                     console.log(note.title);
                      console.log(note.id);
+                     console.log(parseInt($("cardsList").attr("data-id")));
                      clone.removeClass("listTemplate");
                      $("#cardsList").append(clone);
                 });
@@ -133,7 +138,7 @@
               console.log(typeof parseInt(id));
               console.log(parseInt(id));
                  db.notes.get(parseInt(id)).then(function(note){
-                     console.log(note);
+                     console.log(note.id);
                      var clone = $(".detailedTemplate").clone();
                      clone.find(".card-title").text(note.title);
                      clone.find(".card-date").text(note.date); 
@@ -168,6 +173,7 @@
          }); 
          $("body").on("click","#cardList",function(){
              console.log("on click" );
+              console.log($(this).find(".card-title").text());
              loadNotesDetailed($(this).attr("data-id"));
          });
 
